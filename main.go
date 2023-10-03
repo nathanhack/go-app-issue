@@ -164,7 +164,68 @@ func (sc *svgCanvas) OnMount(ctx app.Context) {
 	sc.Scale = 11
 	app.Window().AddEventListener("keydown", sc.OnKeyDown)
 	app.Window().AddEventListener("keyup", sc.OnKeyUp)
-	sc.SetState(`{"Nodes": []}`)
+	sc.SetState(`{
+		"Nodes": [
+			{
+				"Connections": [
+					0
+				],
+				"Index": 0,
+				"X": 4,
+				"Y": 4,
+				"Type": "CheckNode"
+			},
+			{
+				"Connections": [
+					0,
+					1
+				],
+				"Index": 0,
+				"X": 6,
+				"Y": 9,
+				"Type": "VarNode"
+			},
+			{
+				"Connections": [
+					0,
+					1
+				],
+				"Index": 1,
+				"X": 8,
+				"Y": 12,
+				"Type": "CheckNode"
+			},
+			{
+				"Connections": [
+					1,
+					2
+				],
+				"Index": 1,
+				"X": 12,
+				"Y": 18,
+				"Type": "VarNode"
+			},
+			{
+				"Connections": [
+					1,
+					2
+				],
+				"Index": 2,
+				"X": 17,
+				"Y": 20,
+				"Type": "CheckNode"
+			},
+			{
+				"Connections": [
+					2
+				],
+				"Index": 2,
+				"X": 20,
+				"Y": 23,
+				"Type": "VarNode"
+			}
+		]
+	}`)
 }
 
 func scaleDown(v, scale int) int {
@@ -295,7 +356,7 @@ func (sc *svgCanvas) Render() app.UI {
 func (sc *svgCanvas) addToHistory() {
 	str, _ := sc.State()
 	sc.history = append(sc.history, string(str))
-	fmt.Printf("state:%v", string(str))
+	fmt.Printf("state:%v\n", string(str))
 }
 
 func (sc *svgCanvas) DeleteNode(n *Node) {
