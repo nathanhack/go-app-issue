@@ -41,6 +41,7 @@ func (n *Node) Scale() int {
 }
 
 func (n *Node) Render() app.UI {
+	fmt.Printf("Node.Render       %v,%9s,%5v,%p %v\n", n.Index, n.NodeType, n.Highlighted, n, mountedSC.hasNode(n))
 	s := n.Scale()
 	if n.NodeType == CheckNode {
 		return svg.Rect(attr.Width(s*2), attr.Height(s*2),
@@ -140,12 +141,18 @@ func (n *Node) OnClick(ctx app.Context, e app.Event) {
 }
 
 func (n *Node) OnMouseEnter(ctx app.Context, e app.Event) {
+	fmt.Printf("Node.OnMouseEnter %v,%9s,%5v,%p %v\n", n.Index, n.NodeType, n.Highlighted, n, mountedSC.hasNode(n))
 	n.Highlighted = true
 	n.Update()
 }
 func (n *Node) OnMouseLeave(ctx app.Context, e app.Event) {
+	fmt.Printf("Node.OnMouseLeave %v,%9s,%5v,%p %v\n", n.Index, n.NodeType, n.Highlighted, n, mountedSC.hasNode(n))
 	n.Highlighted = false
 	n.Update()
+}
+
+func (n *Node) OnMount(ctx app.Context) {
+	fmt.Printf("Node.OnMount      %v,%9s,%5v,%p %v\n", n.Index, n.NodeType, n.Highlighted, n, mountedSC.hasNode(n))
 }
 
 type svgCanvas struct {
@@ -160,7 +167,17 @@ type svgCanvas struct {
 	selectedNode   *Node
 }
 
+func (sc *svgCanvas) hasNode(n *Node) bool {
+	i := slices.IndexFunc(sc.nodes, func(n2 *Node) bool {
+		return n2 == n
+	})
+	return i >= 0
+}
+
+var mountedSC *svgCanvas
+
 func (sc *svgCanvas) OnMount(ctx app.Context) {
+	mountedSC = sc
 	sc.Scale = 11
 	app.Window().AddEventListener("keydown", sc.OnKeyDown)
 	app.Window().AddEventListener("keyup", sc.OnKeyUp)
@@ -226,6 +243,8 @@ func (sc *svgCanvas) OnMount(ctx app.Context) {
 			}
 		]
 	}`)
+
+	fmt.Println("sc.nodes:", sc.nodes)
 }
 
 func scaleDown(v, scale int) int {
@@ -356,7 +375,7 @@ func (sc *svgCanvas) Render() app.UI {
 func (sc *svgCanvas) addToHistory() {
 	str, _ := sc.State()
 	sc.history = append(sc.history, string(str))
-	fmt.Printf("state:%v\n", string(str))
+	// fmt.Printf("state:%v\n", string(str))
 }
 
 func (sc *svgCanvas) DeleteNode(n *Node) {
@@ -414,6 +433,7 @@ func (sc *svgCanvas) OnKeyDown(ctx app.Context, e app.Event) {
 			}
 			sc.DeleteNode(node)
 			sc.addToHistory()
+			fmt.Println("sc.nodes:", sc.nodes)
 		}
 	}
 	e.StopImmediatePropagation()
